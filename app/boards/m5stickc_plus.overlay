@@ -1,0 +1,34 @@
+/ {
+	chosen {
+		zephyr,display = &st7789v;
+	};
+};
+
+&spi3 {
+	st7789v: st7789v@1 {
+		compatible = "sitronix,st7789v";
+		reg = <1>;
+		spi-max-frequency = <27000000>; /* 27MHz */
+		cmd-data-gpios = <&gpio0 23 GPIO_ACTIVE_LOW>;	/* DET */
+		reset-gpios = <&gpio0 18 GPIO_ACTIVE_LOW>;	/* RESX reset */
+		width = <135>;
+		height = <240>;
+		x-offset = <0>; // TODO: check
+		y-offset = <0>; // TODO: check
+		vcom = <0x28>;
+		gctrl = <0x35>;
+		vrhs = <0x10>;
+		vdvs = <0x20>;
+		mdac = <0x08>;
+//		gamma = <0x01>;
+		colmod = <0x55>;
+		lcm = <0x0c>;
+		porch-param = [0c 0c 00 33 33];
+//		cmd2en-param = [5a 69 02 01];
+		pwctrl1-param = [a4 a1];
+		pvgam-param = [D0 00 02 07 0a 28 32 44 42 06 0e 12 14 17];
+		nvgam-param = [D0 00 02 07 0a 28 31 54 47 0e 1c 17 1b 1e];
+//		ram-param = [00 F0];
+//		rgb-param = [CD 08 14];
+	};
+};
