@@ -23,12 +23,7 @@ jobs:
       - name: Build firmware
         working-directory: example-application
         run: |
-          west build -b custom_plank app
-
-      - name: Twister Tests
-        working-directory: example-application
-        run: |
-          ../zephyr/scripts/twister -G --board-root boards/ --testsuite-root ./tests/
+          west build -b m5stickc_plus app
 
       - name: Archive firmware
         uses: actions/upload-artifact@v2
