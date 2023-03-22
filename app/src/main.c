@@ -1,111 +1,70 @@
-/*
- * Copyright (c) 2018 Jan Van Winkel <jan.van_winkel@dxplore.eu>
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+#include <zephyr.h>
 
-#include <zephyr/device.h>
-#include <zephyr/devicetree.h>
-#include <zephyr/drivers/display.h>
-#include <zephyr/drivers/gpio.h>
-#include <zephyr/drivers/sensor.h>
+#include <device.h>
 
-#include <lvgl.h>
-#include <stdio.h>
+#include <drivers/gpio.h>
+
+#include <sys/printk.h>
+
 #include <string.h>
-#include <zephyr/kernel.h>
 
-#define LOG_LEVEL CONFIG_LOG_DEFAULT_LEVEL
-#include <zephyr/logging/log.h>
-LOG_MODULE_REGISTER(app);
+#define LED_PORT DT_ALIAS_LED0_GPIOS_CONTROLLER
 
-static lv_obj_t * chart1;
-static lv_chart_series_t * ser_x;
-static lv_chart_series_t * ser_y;
-static lv_chart_series_t * ser_z;
+#define LED_PIN  DT_ALIAS_LED0_GPIOS_PIN
 
-const struct device *display_dev;
-const struct device *sensor;
+#define LED_FLAGS DT_ALIAS_LED0_GPIOS_FLAGS
 
-static void fetch_and_display(lv_timer_t * timer)
-{
-	static unsigned int count;
-	struct sensor_value accel[3];
-	const char *overrun = "";
-	int rc = sensor_sample_fetch(sensor);
+void vulnerable_function(const char *input) {
 
-	++count;
-	if (rc == -EBADMSG) {
-		/* Sample overrun.  Ignore in polled mode. */
-		if (IS_ENABLED(CONFIG_LIS2DH_TRIGGER)) {
-			overrun = "[OVERRUN] ";
-		}
-		rc = 0;
-	}
-	if (rc == 0) {
-		rc = sensor_channel_get(sensor,
-					SENSOR_CHAN_ACCEL_XYZ,
-					accel);
-	}
-	if (rc < 0) {
-		LOG_ERR("ERROR: Update failed: %d\n", rc);
-	} else {
-	    lv_chart_set_next_value(chart1, ser_x, sensor_value_to_double(&accel[0]));
-	    lv_chart_set_next_value(chart1, ser_y, sensor_value_to_double(&accel[1]));
-	    lv_chart_set_next_value(chart1, ser_z, sensor_value_to_double(&accel[2]));
-	}
+    char buffer[10];
+
+    strcpy(buffer, input);
+
+    printk("Buffer: %s\n", buffer);
+
 }
-
-void accelerometer_chart(void)
-{
-    chart1 = lv_chart_create(lv_scr_act());
-    lv_obj_set_size(chart1, 320, 240);
-    lv_obj_center(chart1);
-    lv_chart_set_type(chart1, LV_CHART_TYPE_LINE);
-
-    lv_chart_set_div_line_count(chart1, 5, 8);
-
-	lv_chart_set_range(chart1, LV_CHART_AXIS_PRIMARY_Y, -20, 20);
-
-    lv_chart_set_update_mode(chart1, LV_CHART_UPDATE_MODE_SHIFT);
-
-    ser_x = lv_chart_add_series(chart1, lv_palette_main(LV_PALETTE_RED), LV_CHART_AXIS_PRIMARY_Y);
-    ser_y = lv_chart_add_series(chart1, lv_palette_main(LV_PALETTE_BLUE), LV_CHART_AXIS_PRIMARY_Y);
-    ser_z = lv_chart_add_series(chart1, lv_palette_main(LV_PALETTE_GREEN), LV_CHART_AXIS_PRIMARY_Y);
-
-	lv_chart_set_point_count(chart1, 50);
-    /*Do not display points on the data*/
-    lv_obj_set_style_size(chart1, 0, LV_PART_INDICATOR);
-
-    lv_timer_create(fetch_and_display, 10, NULL);
-}  
 
 void main(void)
+
 {
-	int err;
 
-	display_dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_display));
-	if (!device_is_ready(display_dev)) {
-		LOG_ERR("Device not ready, aborting test");
-		return;
-	}
+    int ret;
 
-	sensor = DEVICE_DT_GET_ANY(st_lis2dh);
-	if (sensor == NULL) {
-		LOG_ERR("No lis2dh/lis3dh device found\n");
-		return;
-	}
-	if (!device_is_ready(sensor)) {
-		LOG_ERR("Device %s is not ready\n", sensor->name);
-		return;
-	}
+    struct device *dev = device_get_binding(LED_PORT);
 
-	accelerometer_chart();
+    if (!dev) {
 
-	display_blanking_off(display_dev);
+        printk("Cannot find %s!\n", LED_PORT);
 
-	while (1) {
-		lv_task_handler();
-		k_sleep(K_MSEC(5));
-	}
+        return;
+
+    }
+
+    ret = gpio_pin_configure(dev, LED_PIN, GPIO_OUTPUT_ACTIVE | LED_FLAGS);
+
+    if (ret < 0) {
+
+        printk("Failed to configure pin %d '%s': %d\n", LED_PIN, LED_PORT, ret);
+
+        return;
+
+    }
+
+    while (1) {
+
+        gpio_pin_toggle(dev, LED_PIN);
+
+        k_sleep(K_MSEC(1000));
+
+        printk("Hello, World! from %s\n", CONFIG_BOARD);
+
+        vulnerable_function("This input string is too long and will cause a buffer overflow.");
+
+        k_sleep(K_MSEC(1000));
+
+    }
+
 }
+
+
+	
