@@ -39,23 +39,17 @@ jobs:
       - name: Build firmware
         working-directory: example-application
         run: |
-          west build -b m5stickc_plus app
-
-      - name: Archive firmware
-        uses: actions/upload-artifact@v2
-        with:
-          name: firmware
-          path: example-application/build/zephyr/zephyr.*
+          west build -b m5stickc_plus app -- -D__CDT_PARSER__=1
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
         with:
           category: "/language:${{matrix.language}}"
 
-      - name: Archive CodeQL results
+      - name: Archive firmware
         uses: actions/upload-artifact@v2
         with:
-          name: codeql
-          path: ../results
+          name: firmware
+          path: example-application/build/zephyr/zephyr.*
 
           
