@@ -102,6 +102,10 @@ void main(void)
 
 	accelerometer_chart();
 
+	// add buffer overflow bug
+	char *buf = k_malloc(18);
+	sprintf(buf, "Overflow much? %d", 123456789);
+
 	display_blanking_off(display_dev);
 
 	while (1) {
