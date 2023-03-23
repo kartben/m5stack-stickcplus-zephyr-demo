@@ -39,7 +39,7 @@ jobs:
       - name: Build firmware
         working-directory: example-application
         run: |
-          west build -b m5stickc_plus app -- -D__CDT_PARSER__=1
+          west build -b m5stickc_plus app -- -D__CDT_PARSER__=1 -DCMAKE_EXPORT_COMPILE_COMMANDS=1
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
