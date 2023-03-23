@@ -10,6 +10,8 @@
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/drivers/sensor.h>
 
+// test
+
 #include <lvgl.h>
 #include <stdio.h>
 #include <string.h>
