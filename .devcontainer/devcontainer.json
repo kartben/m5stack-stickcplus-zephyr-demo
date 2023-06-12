@@ -1,5 +1,5 @@
 {
-  "image": "ghcr.io/zephyrproject-rtos/zephyr-build:latest",
+  "image": "zephyrproject-rtos/zephyr-build:latest",
   "features": {
     
   }
