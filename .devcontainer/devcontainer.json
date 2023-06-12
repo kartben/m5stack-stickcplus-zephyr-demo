@@ -1,5 +1,5 @@
 {
-  "image": "zephyrproject-rtos/zephyr-build:latest",
+  "image": "mcr.microsoft.com/devcontainers/universal:2",
   "features": {
     
   }
