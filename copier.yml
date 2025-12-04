@@ -16,11 +16,6 @@ author_name:
   help: Who is the author?
   default: Zephyr Developer
 
-board:
-  type: str
-  help: Which board are you targeting?
-  default: native_sim
-
 include_ci:
   type: bool
   help: Do you want to include GitHub Actions CI?
@@ -28,7 +23,7 @@ include_ci:
 
 include_docs:
   type: bool
-  help: Do you want to include documentation setup?
+  help: Do you want to include documentation infrastructure?
   default: true
 
 include_drivers:
@@ -46,12 +41,26 @@ include_tests:
   help: Do you want to include example tests?
   default: true
 
+zephyr_version:
+  type: str
+  help: Which Zephyr version are you targeting? (e.g. v4.2.0, v4.3.0, main)
+  default: main
+
+configure_modules:
+  type: bool
+  help: Do you want to interactively select Zephyr modules to include? (Requires internet access)
+  default: false
+
+_tasks:
+  - "{% if configure_modules %}python3 scripts/setup_modules.py{% endif %}"
+
 _exclude:
   - "copier.yml"
   - ".git"
   - ".copier-answers.yml"
   - "{% if not include_ci %}.github{% endif %}"
   - "{% if not include_docs %}doc{% endif %}"
+  - "{% if not include_docs %}.github/workflows/docs.yml{% endif %}"
   - "{% if not include_drivers %}drivers{% endif %}"
   - "{% if not include_lib %}lib{% endif %}"
   - "{% if not include_tests %}tests{% endif %}"
