@@ -11,5 +11,9 @@ zephyr_syscall_include_directories(include)
 
 zephyr_include_directories(include)
 
+{% if include_drivers %}
 add_subdirectory(drivers)
+{% endif %}
+{% if include_lib %}
 add_subdirectory(lib)
+{% endif %}

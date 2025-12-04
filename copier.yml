@@ -1,0 +1,57 @@
+_min_copier_version: "9.0.0"
+
+
+project_name:
+  type: str
+  help: What is the name of your project? (use a slug, e.g. my-app)
+  default: my-zephyr-app
+
+project_description:
+  type: str
+  help: Provide a short description of your project.
+  default: A custom Zephyr application.
+
+author_name:
+  type: str
+  help: Who is the author?
+  default: Zephyr Developer
+
+board:
+  type: str
+  help: Which board are you targeting?
+  default: native_sim
+
+include_ci:
+  type: bool
+  help: Do you want to include GitHub Actions CI?
+  default: true
+
+include_docs:
+  type: bool
+  help: Do you want to include documentation setup?
+  default: true
+
+include_drivers:
+  type: bool
+  help: Do you want to include example drivers?
+  default: true
+
+include_lib:
+  type: bool
+  help: Do you want to include example libraries?
+  default: true
+
+include_tests:
+  type: bool
+  help: Do you want to include example tests?
+  default: true
+
+_exclude:
+  - "copier.yml"
+  - ".git"
+  - ".copier-answers.yml"
+  - "{% if not include_ci %}.github{% endif %}"
+  - "{% if not include_docs %}doc{% endif %}"
+  - "{% if not include_drivers %}drivers{% endif %}"
+  - "{% if not include_lib %}lib{% endif %}"
+  - "{% if not include_tests %}tests{% endif %}"
